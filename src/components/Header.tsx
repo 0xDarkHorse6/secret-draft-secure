@@ -1,4 +1,4 @@
-import { Lock } from "lucide-react";
+import { Zap, Eye, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { WalletConnect } from "./WalletConnect";
 import logo from "@/assets/logo.png";
@@ -17,8 +17,8 @@ export function Header() {
             </h1>
           </Link>
           <div className="hidden md:flex items-center gap-1 text-xs text-muted-foreground">
-            <Lock className="h-3 w-3" />
-            <span>Picks Encrypted</span>
+            <Zap className="h-3 w-3" />
+            <span>FHE Powered</span>
           </div>
         </div>
 

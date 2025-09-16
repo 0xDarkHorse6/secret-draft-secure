@@ -9,13 +9,13 @@ Create a `.env` file in the root directory with the following variables:
 ```env
 # Chain Configuration
 NEXT_PUBLIC_CHAIN_ID=11155111
-NEXT_PUBLIC_RPC_URL=https://sepolia.infura.io/v3/b18fb7e6ca7045ac83c41157ab93f990
+NEXT_PUBLIC_RPC_URL=your_rpc_endpoint
 
 # Wallet Connect Configuration
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=2ec9743d0d0cd7fb94dee1a7e6d33475
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
 
 # Infura Configuration
-NEXT_PUBLIC_INFURA_API_KEY=b18fb7e6ca7045ac83c41157ab93f990
+NEXT_PUBLIC_INFURA_API_KEY=your_infura_key
 
 # Contract Configuration
 VITE_CONTRACT_ADDRESS=your_deployed_contract_address_here
@@ -33,17 +33,17 @@ PRIVATE_KEY=your_private_key_here
 
 ### NEXT_PUBLIC_RPC_URL
 - **Description**: RPC endpoint for connecting to Sepolia testnet
-- **Value**: `https://sepolia.infura.io/v3/b18fb7e6ca7045ac83c41157ab93f990`
+- **Value**: `your_rpc_endpoint`
 - **Required**: Yes
 
 ### NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 - **Description**: WalletConnect project ID for wallet connections
-- **Value**: `2ec9743d0d0cd7fb94dee1a7e6d33475`
+- **Value**: `your_project_id`
 - **Required**: Yes
 
 ### NEXT_PUBLIC_INFURA_API_KEY
 - **Description**: Infura API key for blockchain access
-- **Value**: `b18fb7e6ca7045ac83c41157ab93f990`
+- **Value**: `your_infura_key`
 - **Required**: Yes
 
 ### VITE_CONTRACT_ADDRESS

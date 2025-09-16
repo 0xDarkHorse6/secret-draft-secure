@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Lock, Eye, Users } from "lucide-react";
+import { Zap, Lock, Eye, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-fantasy.jpg";
 
@@ -19,8 +19,8 @@ export function Hero() {
         <div className="max-w-4xl mx-auto">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-sm border border-crypto/30 rounded-full px-4 py-2 mb-6">
-            <Shield className="h-4 w-4 text-crypto" />
-            <span className="text-sm text-muted-foreground">Blockchain-Secured Fantasy Sports</span>
+            <Zap className="h-4 w-4 text-crypto" />
+            <span className="text-sm text-muted-foreground">FHE-Powered Fantasy Sports</span>
           </div>
 
           {/* Main Heading */}

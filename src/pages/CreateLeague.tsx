@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Shield, Users, Trophy, Calendar } from "lucide-react";
+import { Zap, Users, Trophy, Calendar } from "lucide-react";
 
 const CreateLeague = () => {
   return (
@@ -103,8 +103,8 @@ const CreateLeague = () => {
 
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <Shield className="h-5 w-5 text-encrypted" />
-                      Encryption Settings
+                      <Zap className="h-5 w-5 text-encrypted" />
+                      FHE Settings
                     </h3>
                     
                     <div className="flex items-center justify-between">
@@ -158,9 +158,9 @@ const CreateLeague = () => {
                       <span className="text-success">$0.00</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Encryption:</span>
+                      <span className="text-muted-foreground">FHE:</span>
                       <div className="flex items-center gap-1">
-                        <Shield className="h-3 w-3 text-encrypted" />
+                        <Zap className="h-3 w-3 text-encrypted" />
                         <span className="text-encrypted">Enabled</span>
                       </div>
                     </div>
