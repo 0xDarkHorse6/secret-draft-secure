@@ -6,6 +6,7 @@ import { WalletProvider } from "./components/WalletProvider";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Leagues from "./pages/Leagues";
+import LeagueView from "./pages/LeagueView";
 import Players from "./pages/Players";
 import CreateLeague from "./pages/CreateLeague";
 import CreateLineup from "./pages/CreateLineup";
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leagues" element={<Leagues />} />
+          <Route path="/league/:id" element={<LeagueView />} />
           <Route path="/players" element={<Players />} />
           <Route path="/create-league" element={<CreateLeague />} />
           <Route path="/create-lineup" element={<CreateLineup />} />

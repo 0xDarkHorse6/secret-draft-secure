@@ -7,8 +7,103 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Zap, Users, Trophy, Calendar } from "lucide-react";
+import { useState } from "react";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { parseEther } from "viem";
+import { SecretDraftSecureABI } from "@/lib/contractABI";
+import { encryptData, generateFHEPublicKey } from "@/lib/fheEncryption";
+import { toast } from "sonner";
+
+const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with actual contract address
 
 const CreateLeague = () => {
+  const { address, isConnected } = useAccount();
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    sport: "",
+    maxPlayers: "",
+    entryFee: "",
+    draftDate: "",
+    encryptPicks: true,
+    lateSwap: false
+  });
+
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleCreateLeague = async () => {
+    if (!isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
+    if (!formData.name || !formData.entryFee || !formData.maxPlayers) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      // Generate FHE public key for encryption
+      const fhePublicKey = generateFHEPublicKey();
+      
+      // Encrypt league settings
+      const leagueSettings = {
+        name: formData.name,
+        description: formData.description,
+        sport: formData.sport,
+        encryptPicks: formData.encryptPicks,
+        lateSwap: formData.lateSwap,
+        fhePublicKey
+      };
+      
+      const encryptedSettings = await encryptData(leagueSettings);
+      
+      const entryFeeWei = parseEther(formData.entryFee);
+      const draftDeadline = Math.floor(new Date(formData.draftDate || Date.now() + 7 * 24 * 60 * 60 * 1000).getTime() / 1000);
+      const lineupDeadline = draftDeadline + 24 * 60 * 60; // 24 hours after draft
+
+      writeContract({
+        address: CONTRACT_ADDRESS as `0x${string}`,
+        abi: SecretDraftSecureABI,
+        functionName: 'createLeague',
+        args: [
+          formData.name,
+          entryFeeWei,
+          BigInt(formData.maxPlayers),
+          BigInt(draftDeadline),
+          BigInt(lineupDeadline)
+        ],
+        value: entryFeeWei,
+      });
+
+      toast.success("FHE-encrypted league created! Transaction submitted for confirmation.");
+      console.log("Encrypted league settings:", encryptedSettings);
+    } catch (err) {
+      console.error("Error creating league:", err);
+      toast.error("Failed to create league. Please try again.");
+    }
+  };
+
+  // Show success message when transaction is confirmed
+  if (isConfirmed) {
+    toast.success("League created successfully!");
+  }
+
+  // Show error message if transaction fails
+  if (error) {
+    toast.error(`Transaction failed: ${error.message}`);
+  }
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -30,11 +125,13 @@ const CreateLeague = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="league-name">League Name</Label>
+                    <Label htmlFor="league-name">League Name *</Label>
                     <Input 
                       id="league-name" 
                       placeholder="Enter league name"
                       className="bg-background border-border/50"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange("name", e.target.value)}
                     />
                   </div>
 
@@ -44,13 +141,15 @@ const CreateLeague = () => {
                       id="description" 
                       placeholder="Describe your league..."
                       className="bg-background border-border/50"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange("description", e.target.value)}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="sport">Sport</Label>
-                      <Select>
+                      <Select value={formData.sport} onValueChange={(value) => handleInputChange("sport", value)}>
                         <SelectTrigger className="bg-background border-border/50">
                           <SelectValue placeholder="Select sport" />
                         </SelectTrigger>
@@ -64,8 +163,8 @@ const CreateLeague = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="max-players">Max Players</Label>
-                      <Select>
+                      <Label htmlFor="max-players">Max Players *</Label>
+                      <Select value={formData.maxPlayers} onValueChange={(value) => handleInputChange("maxPlayers", value)}>
                         <SelectTrigger className="bg-background border-border/50">
                           <SelectValue placeholder="Select max players" />
                         </SelectTrigger>
@@ -82,12 +181,15 @@ const CreateLeague = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="entry-fee">Entry Fee (USD)</Label>
+                      <Label htmlFor="entry-fee">Entry Fee (ETH) *</Label>
                       <Input 
                         id="entry-fee" 
                         type="number"
-                        placeholder="0.00"
+                        step="0.001"
+                        placeholder="0.025"
                         className="bg-background border-border/50"
+                        value={formData.entryFee}
+                        onChange={(e) => handleInputChange("entryFee", e.target.value)}
                       />
                     </div>
 
@@ -97,6 +199,8 @@ const CreateLeague = () => {
                         id="draft-date" 
                         type="datetime-local"
                         className="bg-background border-border/50"
+                        value={formData.draftDate}
+                        onChange={(e) => handleInputChange("draftDate", e.target.value)}
                       />
                     </div>
                   </div>
@@ -112,7 +216,11 @@ const CreateLeague = () => {
                         <Label htmlFor="encrypt-picks">Encrypt All Picks</Label>
                         <p className="text-sm text-muted-foreground">Hide player selections until game start</p>
                       </div>
-                      <Switch id="encrypt-picks" defaultChecked />
+                      <Switch 
+                        id="encrypt-picks" 
+                        checked={formData.encryptPicks}
+                        onCheckedChange={(checked) => handleInputChange("encryptPicks", checked)}
+                      />
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -120,7 +228,11 @@ const CreateLeague = () => {
                         <Label htmlFor="late-swap">Allow Late Swaps</Label>
                         <p className="text-sm text-muted-foreground">Enable lineup changes after encryption</p>
                       </div>
-                      <Switch id="late-swap" />
+                      <Switch 
+                        id="late-swap" 
+                        checked={formData.lateSwap}
+                        onCheckedChange={(checked) => handleInputChange("lateSwap", checked)}
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -166,8 +278,13 @@ const CreateLeague = () => {
                     </div>
                   </div>
 
-                  <Button variant="crypto" className="w-full mt-6">
-                    Create League
+                  <Button 
+                    variant="crypto" 
+                    className="w-full mt-6"
+                    onClick={handleCreateLeague}
+                    disabled={isPending || isConfirming}
+                  >
+                    {isPending || isConfirming ? "Creating..." : "Create League"}
                   </Button>
                 </CardContent>
               </Card>
